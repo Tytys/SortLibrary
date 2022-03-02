@@ -49,41 +49,9 @@ namespace SortLibrary
     }
     public static class ListQuickSortExtention
     {
-        private static void QuickSort<T>(this List<T> array, int minIndex, int maxIndex) where T : IComparable<T>
-        {
-            if (minIndex >= maxIndex)
-            {
-                return;
-            }
-            var pivotIndex = Partition(minIndex, maxIndex);
-            array.QuickSort(minIndex, pivotIndex - 1);
-            array.QuickSort(pivotIndex + 1, maxIndex);
-            static void Swap(ref T x, ref T y)
-            {
-                var t = x;
-                x = y;
-                y = t;
-            }
-            int Partition(int minIndex, int maxIndex)
-            {
-                var pivot = minIndex - 1;
-                for (var i = minIndex; i < maxIndex; i++)
-                {
-                    if (array[i].CompareTo(array[maxIndex]) < 0)
-                    {
-                        pivot++;
-                        Swap(ref array.ToArray()[pivot], ref array.ToArray()[i]);
-                    }
-                }
-
-                pivot++;
-                Swap(ref array.ToArray()[pivot], ref array.ToArray()[maxIndex]);
-                return pivot;
-            }
-        }
         public static void QuickSort<T>(this List<T> array) where T : IComparable<T>
         {
-            array.QuickSort(0, array.Count - 1);
+            array.Cloner(ArrayQuickSortExtention.QuickSort);
         }             
     }
 
@@ -108,30 +76,13 @@ namespace SortLibrary
     {
         public static void InsertionSort<T>(this List<T> array) where T : IComparable<T>
         {
-            for (var i = 1; i < array.Count; i++)
-            {
-                var key = array[i];
-                var j = i;
-                while ((j > 1) && (array[j - 1].CompareTo(key) > 0))
-                {
-                    Swap(ref array.ToArray()[j - 1], ref array.ToArray()[j]);
-                    j--;
-                }
-                array[j] = key;
-            }
-
-            static void Swap(ref T e1, ref T e2)
-            {
-                var temp = e1;
-                e1 = e2;
-                e2 = temp;
-            }
+            array.Cloner(ArrayInsertionSortExtention.InsertionSort);
         }
     }
 
     public static class ArrayMergeSortExtention
     {
-        private static T[] MergeSort<T>(this T[] array, int lowIndex, int highIndex) where T : IComparable<T>
+        private static void MergeSort<T>(this T[] array, int lowIndex, int highIndex) where T : IComparable<T>
         {
             if (lowIndex < highIndex)
             {
@@ -140,7 +91,6 @@ namespace SortLibrary
                 array.MergeSort(middleIndex + 1, highIndex);
                 Merge(lowIndex, middleIndex, highIndex);
             }
-            return array;
             void Merge(int lowIndex, int middleIndex, int highIndex)
             {
                 var left = lowIndex;
@@ -182,67 +132,16 @@ namespace SortLibrary
                 }
             }
         }
-        public static T[] MergeSort<T>(this T[] array) where T : IComparable<T>
+        public static void MergeSort<T>(this T[] array) where T : IComparable<T>
         {
-            return MergeSort(array, 0, array.Length - 1);
+            MergeSort(array, 0, array.Length - 1);
         }
     }
     public static class ListMergeSortextention
     {
-        private static void MergeSort<T>(this List<T> array, int lowIndex, int highIndex) where T : IComparable<T>
-        {
-            if (lowIndex < highIndex)
-            {
-                var middleIndex = (lowIndex + highIndex) / 2;
-                array.MergeSort(lowIndex, middleIndex);
-                array.MergeSort(middleIndex + 1, highIndex);
-                Merge(lowIndex, middleIndex, highIndex);
-            }
-
-            void Merge(int lowIndex, int middleIndex, int highIndex)
-            {
-                var left = lowIndex;
-                var right = middleIndex + 1;
-                var tempArray = new T[highIndex - lowIndex + 1];
-                var index = 0;
-
-                while ((left <= middleIndex) && (right <= highIndex))
-                {
-                    if (array[left].CompareTo(array[right]) < 0)
-                    {
-                        tempArray[index] = array[left];
-                        left++;
-                    }
-                    else
-                    {
-                        tempArray[index] = array[right];
-                        right++;
-                    }
-
-                    index++;
-                }
-
-                for (var i = left; i <= middleIndex; i++)
-                {
-                    tempArray[index] = array[i];
-                    index++;
-                }
-
-                for (var i = right; i <= highIndex; i++)
-                {
-                    tempArray[index] = array[i];
-                    index++;
-                }
-
-                for (var i = 0; i < tempArray.Length; i++)
-                {
-                    array[lowIndex + i] = tempArray[i];
-                }
-            }
-        }
         public static void MergeSort<T>(this List<T> array) where T : IComparable<T>
         {
-            MergeSort(array, 0, array.Count - 1);
+            array.Cloner(ArrayMergeSortExtention.MergeSort);
         }
     }
 
@@ -291,47 +190,10 @@ namespace SortLibrary
         }
     }
     public static class ListTreeSortExtention
-    {
-        static private int max = 0;
-        private class tree<T> where T : IComparable<T>
-        {
-            public T value;
-            public tree<T> left;
-            public tree<T> right;
-        }
-        static private tree<T> add_to_tree<T>(tree<T> root, T new_value) where T : IComparable<T>
-        {
-
-            if (root == null)
-            {
-                root = new tree<T>();
-                root.value = new_value;
-                root.left = null;
-                root.right = null;
-                return root;
-            }
-            if (root.value.CompareTo(new_value) < 0)
-            { root.right = add_to_tree(root.right, new_value); }
-            else { root.left = add_to_tree(root.left, new_value); };
-            return root;
-        }
-
-        static private void tree_to_array<T>(tree<T> root, List<T> a) where T : IComparable<T>
-        {
-            if (root == null) return;
-            tree_to_array(root.left, a);
-            a[max++] = root.value;
-            tree_to_array(root.right, a);
-        }
-
+    {       
         static public void TreeSort<T>(this List<T> a) where T : IComparable<T>
         {
-            tree<T> root = null;
-            for (int i = 0; i < a.Count; i++)
-            {
-                root = add_to_tree(root, a[i]);
-            }
-            tree_to_array(root, a);
+            a.Cloner(ArrayTreeSortExtention.TreeSort);
         }
     }
 
@@ -373,34 +235,7 @@ namespace SortLibrary
     {
         public static void BogoSort<T>(this List<T> array) where T : IComparable<T>
         {
-            while (!IsSorted())
-            {
-                array = RandomPermutation(array);
-            }
-            bool IsSorted()
-            {
-                for (int i = 0; i < array.Count - 1; i++)
-                {
-                    if (array[i].CompareTo(array[i + 1]) > 0)
-                        return false;
-                }
-
-                return true;
-            }
-            List<T> RandomPermutation(List<T> arr)
-            {
-                Random random = new Random();
-                var n = arr.Count;
-                while (n > 1)
-                {
-                    n--;
-                    var i = random.Next(n + 1);
-                    var temp = arr[i];
-                    arr[i] = arr[n];
-                    arr[n] = temp;
-                }
-                return arr;
-            }
+            array.Cloner(ArrayBogoSortExtention.BogoSort);
         }
     }
 
@@ -431,9 +266,7 @@ namespace SortLibrary
     {
         public static void BubbleSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            array.BubbleSort();
-            array.Cloner(newarr);
+            array.Cloner(ArrayBubbleSortExtention.BubbleSort);
         }
     }
 
@@ -480,9 +313,7 @@ namespace SortLibrary
     {
         public static void ShakerSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            newarr.ShellSort();
-            array.Cloner(newarr);
+            array.Cloner(ArrayShakerSortExtention.ShakerSort);
         }
     }
 
@@ -520,11 +351,8 @@ namespace SortLibrary
     {
         public static void StoogeSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            newarr.StoogeSort();
-            array.Cloner(newarr);
+            array.Cloner(ArrayStoogeSortExtention.StoogeSort);
         }
-
     }
 
     public static class ArrayPancakeSortExtention
@@ -568,8 +396,7 @@ namespace SortLibrary
     {
         public static void PancakeSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            array.Cloner(newarr);
+            array.Cloner(ArrayPancakeSortExtention.PancakeSort);
         }
     }
 
@@ -605,15 +432,13 @@ namespace SortLibrary
     {
         static void ShellSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            newarr.ShellSort();
-            array.Cloner(newarr);
+            array.Cloner(ArrayShellSortExtention.ShellSort);
         }
     }
 
     public static class ArraySelectionSortExtention
     {
-        public static void SelectionSort<T>(this T[] array, int currentIndex = 0) where T : IComparable<T>
+        internal static void SelectionSort<T>(this T[] array, int currentIndex = 0) where T : IComparable<T>
         {
             if (currentIndex == array.Length)
                 return;
@@ -645,14 +470,16 @@ namespace SortLibrary
                 list[bInd] = value;
             }
         }
+        public static void SelectionSort<T>(this T[] array) where T : IComparable<T>
+        {
+            array.SelectionSort();
+        }
     }
     public static class ListSelectionSortExtention
     {
         public static void SelectionSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            newarr.SelectionSort();
-            array.Cloner(newarr);
+            array.Cloner(ArraySelectionSortExtention.SelectionSort);
         }
     }
 
@@ -693,9 +520,7 @@ namespace SortLibrary
     {
         public static void GnomeSort<T>(this List<T> unsortedArray) where T : IComparable<T>
         {
-            var newarr = unsortedArray.ToArray();
-            newarr.GnomeSort();
-            unsortedArray.Cloner(newarr);
+            unsortedArray.Cloner(ArrayGnomeSortExtention.GnomeSort);
         }
     }
 
@@ -752,9 +577,7 @@ namespace SortLibrary
     {
         public static void CombSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            newarr.CombSort();
-            array.Cloner(newarr);
+            array.Cloner(ArrayCombSortExtention.CombSort);
         }
     }
 
@@ -1376,17 +1199,15 @@ namespace SortLibrary
     {
         public static void TimSort<T>(this List<T> array) where T : IComparable<T>
         {
-            var newarr = array.ToArray();
-            TimSortClass<T>.sort(newarr);
-            array.Cloner(newarr);
+            array.Cloner(ArrayTimSortExtention.TimSort);
         }
     }
 
     public static class HeapSortExtention
     {
-        public class HeapSort
+        public class HeapSort<T> where T : IComparable<T>
         {
-            public void sort(int[] arr)
+            public static void sort(this T[] arr)
             {
                 int n = arr.Length;
 
@@ -1427,7 +1248,6 @@ namespace SortLibrary
         }
     }
 
-    delegate void ListAdder<T>(T[] araу) where T : IComparable<T>;
     public static class ArrayTools
     {
         public static bool IsSortedAscending<TSource>(this IList<TSource> dataSource) where TSource : IComparable
@@ -1452,23 +1272,19 @@ namespace SortLibrary
 
             return array;
         }
-        delegate void op<T>(T[] arr) where T : IComparable<T>;
-        internal static void Cloner<T>(this List<T> arr1, T[] arr2, Action action) where T : IComparable<T>
+        internal static void Cloner<T>(this List<T> arr1, Action<T[]> operation) where T : IComparable<T>
         {
             var newarr = arr1.ToArray();
-            op<T> operation = new op<T>(arr1, action);
+            operation(newarr);
+            Clone();
             void Clone()
             {
                 arr1.Clear();
-                for (int i = 0; i < arr2.Count(); i++)
+                for (int i = 0; i < newarr.Count(); i++)
                 {
-                    arr1.Add(arr2[i]);
+                    arr1.Add(newarr[i]);
                 }
             }
         }
-    }
-    internal class ListTools
-    {
-        delegate void op<T>(T[] arr) where T : IComparable<T>;
     }
 }
