@@ -1205,46 +1205,50 @@ namespace SortLibrary
 
     public static class HeapSortExtention
     {
-        public class HeapSort<T> where T : IComparable<T>
+        public class HeapSortClass<T> where T : IComparable<T>
         {
-            public static void sort(this T[] arr)
+            public static void sort(T[] arr)
             {
                 int n = arr.Length;
 
                 for (int i = n / 2 - 1; i >= 0; i--)
-                    heapify(arr, n, i);
+                    heapify(arr, Operator<int, T>.Convert(n), Operator<int, T>.Convert(i));
 
                 for (int i = n - 1; i >= 0; i--)
                 {
-                    int temp = arr[0];
+                    T temp = arr[0];
                     arr[0] = arr[i];
                     arr[i] = temp;
 
-                    heapify(arr, i, 0);
+                    heapify(arr,  Operator<int, T>.Convert(i), Operator<int, T>.Convert(0));
                 }
             }
 
-            void heapify(int[] arr, int n, int i)
+            static void heapify(T[] arr, T n, T i)
             {
-                int largest = i;
-                int l = 2 * i + 1; // left = 2*i + 1
-                int r = 2 * i + 2; // right = 2*i + 2
+                T largest = i;
+                T l = Operator<long, T>.Convert(Operator<T, long>.Multiply(2, i) + 1); // left = 2*i + 1
+                T r = Operator<long, T>.Convert(Operator<T, long>.Multiply(2, i) + 2); // right = 2*i + 2
 
-                if (l < n && arr[l] > arr[largest])
+                if (l.CompareTo(n) < 0 && arr[Operator<T, long>.Convert(l)].CompareTo(arr[Operator<T, long>.Convert(largest)]) > 0)
                     largest = l;
 
-                if (r < n && arr[r] > arr[largest])
+                if (r.CompareTo(n) < 0 && arr[Operator<T, long>.Convert(r)].CompareTo(arr[Operator<T, long>.Convert(largest)]) > 0)
                     largest = r;
 
-                if (largest != i)
+                if (Operator<T>.NotEqual(largest, i))
                 {
-                    int swap = arr[i];
-                    arr[i] = arr[largest];
-                    arr[largest] = swap;
+                    T swap = arr[Operator<T, long>.Convert(i)];
+                    arr[Operator<T, long>.Convert(i)] = arr[Operator<T, long>.Convert(largest)];
+                    arr[Operator<T, long>.Convert(largest)] = swap;
 
                     heapify(arr, n, largest);
                 }
             }
+        }
+        public static void HeapSort<T>() where T : IComparable<T>
+        {
+
         }
     }
 
