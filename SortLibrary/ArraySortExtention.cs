@@ -6,42 +6,10 @@ using System.Diagnostics;
 namespace SortLibrary
 {
     public static class ArrayQuickSortExtention
-    {
-        private static void QuickSort<T>(this T[] array, int minIndex, int maxIndex) where T : IComparable<T>
-        {
-            if (minIndex >= maxIndex)
-            {
-                return;
-            }
-            var pivotIndex = Partition(minIndex, maxIndex);
-            array.QuickSort(minIndex, pivotIndex - 1);
-            array.QuickSort(pivotIndex + 1, maxIndex);
-            static void Swap(ref T x, ref T y)
-            {
-                var t = x;
-                x = y;
-                y = t;
-            }
-            int Partition(int minIndex, int maxIndex)
-            {
-                var pivot = minIndex - 1;
-                for (var i = minIndex; i < maxIndex; i++)
-                {
-                    if (array[i].CompareTo(array[maxIndex]) < 0)
-                    {
-                        pivot++;
-                        Swap(ref array[pivot], ref array[i]);
-                    }
-                }
-
-                pivot++;
-                Swap(ref array[pivot], ref array[maxIndex]);
-                return pivot;
-            }
-        }
+    { 
         public static void QuickSort<T>(this T[] array) where T : IComparable<T>
         {
-            array.QuickSort(0, array.Length - 1);
+            array.ArrayTToInt(IntQuickSortExtention.IntQuickSort);
         }
     }
     public static class ListQuickSortExtention
@@ -95,17 +63,7 @@ namespace SortLibrary
     {
         public static void InsertionSort<T>(this T[] array) where T : IComparable<T>
         {
-            for (var i = 1; i < array.Length; i++)
-            {
-                var key = array[i];
-                var j = i - 1;
-                while ((j >= 0) && (array[j].CompareTo(key) > 0))
-                {
-                    array[j + 1] = array[j];
-                    j -= 1;
-                }
-                array[j + 1] = key;
-            }
+            array.ArrayTToInt(IntInsertionSortExtention.InsertionSort);
         }
     }
     public static class ListInsertionSortExtention
@@ -135,59 +93,10 @@ namespace SortLibrary
 
     public static class ArrayMergeSortExtention
     {
-        private static void MergeSort<T>(this T[] array, int lowIndex, int highIndex) where T : IComparable<T>
-        {
-            if (lowIndex < highIndex)
-            {
-                var middleIndex = (lowIndex + highIndex) / 2;
-                array.MergeSort(lowIndex, middleIndex);
-                array.MergeSort(middleIndex + 1, highIndex);
-                Merge(lowIndex, middleIndex, highIndex);
-            }
-            void Merge(int lowIndex, int middleIndex, int highIndex)
-            {
-                var left = lowIndex;
-                var right = middleIndex + 1;
-                var tempArray = new T[highIndex - lowIndex + 1];
-                var index = 0;
-
-                while ((left <= middleIndex) && (right <= highIndex))
-                {
-                    if (array[left].CompareTo(array[right]) < 0)
-                    {
-                        tempArray[index] = array[left];
-                        left++;
-                    }
-                    else
-                    {
-                        tempArray[index] = array[right];
-                        right++;
-                    }
-
-                    index++;
-                }
-
-                for (var i = left; i <= middleIndex; i++)
-                {
-                    tempArray[index] = array[i];
-                    index++;
-                }
-
-                for (var i = right; i <= highIndex; i++)
-                {
-                    tempArray[index] = array[i];
-                    index++;
-                }
-
-                for (var i = 0; i < tempArray.Length; i++)
-                {
-                    array[lowIndex + i] = tempArray[i];
-                }
-            }
-        }
+        
         public static void MergeSort<T>(this T[] array) where T : IComparable<T>
         {
-            MergeSort(array, 0, array.Length - 1);
+            array.ArrayTToInt(IntMergeSortExtention.IntMergeSort);
         }
     }
     public static class ListMergeSortextention
@@ -257,46 +166,9 @@ namespace SortLibrary
 
     public static class ArrayTreeSortExtention
     {
-        static private int max = 0;
-        private class tree<T> where T : IComparable<T>
-        {
-            public T value;
-            public tree<T> left;
-            public tree<T> right;
-        }
-        static private tree<T> add_to_tree<T>(tree<T> root, T new_value) where T : IComparable<T>
-        {
-
-            if (root == null)
-            {
-                root = new tree<T>();
-                root.value = new_value;
-                root.left = null;
-                root.right = null;
-                return root;
-            }
-            if (root.value.CompareTo(new_value) < 0)
-            { root.right = add_to_tree(root.right, new_value); }
-            else { root.left = add_to_tree(root.left, new_value); };
-            return root;
-        }
-
-        static private void tree_to_array<T>(tree<T> root, T[] a) where T : IComparable<T>
-        {
-            if (root == null) return;
-            tree_to_array(root.left, a);
-            a[max++] = root.value;
-            tree_to_array(root.right, a);
-        }
-
         static public void TreeSort<T>(this T[] a) where T : IComparable<T>
         {
-            tree<T> root = null;
-            for (int i = 0; i < a.Length; i++)
-            {
-                root = add_to_tree(root, a[i]);
-            }
-            tree_to_array(root, a);
+            a.ArrayTToInt(IntTreeSortExtention.TreeSort);
         }
     }
     public static class ListTreeSortExtention
@@ -355,34 +227,7 @@ namespace SortLibrary
     {
         public static void BogoSort<T>(this T[] array) where T : IComparable<T>
         {
-            while (!IsSorted())
-            {
-                array = RandomPermutation(array);
-            }
-            bool IsSorted()
-            {
-                for (int i = 0; i < array.Length - 1; i++)
-                {
-                    if (array[i].CompareTo(array[i + 1]) > 0)
-                        return false;
-                }
-
-                return true;
-            }
-            T[] RandomPermutation(T[] arr)
-            {
-                Random random = new Random();
-                var n = arr.Length;
-                while (n > 1)
-                {
-                    n--;
-                    var i = random.Next(n + 1);
-                    var temp = arr[i];
-                    arr[i] = arr[n];
-                    arr[n] = temp;
-                }
-                return arr;
-            }
+            array.ArrayTToInt(IntBogoSortExtention.IntBogoSort);
         }
     }
     public static class ListBogoSortExtention
@@ -485,39 +330,7 @@ namespace SortLibrary
     {
         public static void ShakerSort<T>(this T[] array) where T : IComparable<T>
         {
-            for (var i = 0; i < array.Length / 2; i++)
-            {
-                var swapFlag = false;
-                for (var j = i; j < array.Length - i - 1; j++)
-                {
-                    if (array[j].CompareTo(array[j + 1]) > 0)
-                    {
-                        Swap(ref array[j], ref array[j + 1]);
-                        swapFlag = true;
-                    }
-                }
-
-                for (var j = array.Length - 2 - i; j > i; j--)
-                {
-                    if (array[j - 1].CompareTo(array[j]) > 0)
-                    {
-                        Swap(ref array[j - 1], ref array[j]);
-                        swapFlag = true;
-                    }
-                }
-
-                if (!swapFlag)
-                {
-                    break;
-                }
-            }
-
-            static void Swap(ref T e1, ref T e2)
-            {
-                var temp = e1;
-                e1 = e2;
-                e2 = temp;
-            }
+            array.ArrayTToInt(IntShakerSortExtention.IntShakerSort);
         }
     }
     public static class ListShakerSortExtention
@@ -639,37 +452,7 @@ namespace SortLibrary
     {
         public static void PancakeSort<T>(this T[] array) where T : IComparable<T>
         {
-            for (var subArrayLength = array.Length - 1; subArrayLength >= 0; subArrayLength--)
-            {
-                var indexOfMax = IndexOfMax(subArrayLength);
-                if (indexOfMax != subArrayLength)
-                {
-                    Flip(indexOfMax);
-                    Flip(subArrayLength);
-                }
-            }
-            int IndexOfMax(int n)
-            {
-                int result = 0;
-                for (var i = 1; i <= n; ++i)
-                {
-                    if (array[i].CompareTo(array[result]) > 0)
-                    {
-                        result = i;
-                    }
-                }
-
-                return result;
-            }
-            void Flip(int end)
-            {
-                for (var start = 0; start < end; start++, end--)
-                {
-                    var temp = array[start];
-                    array[start] = array[end];
-                    array[end] = temp;
-                }
-            }
+            array.ArrayTToInt(IntPancakeSortExtention.IntPancakeSort);
         }
     }
     public static class ListPancakeSortExtention
@@ -721,28 +504,7 @@ namespace SortLibrary
     {
         public static void ShellSort<T>(this T[] array) where T : IComparable<T>
         {
-            var d = array.Length / 2;
-            while (d >= 1)
-            {
-                for (var i = d; i < array.Length; i++)
-                {
-                    var j = i;
-                    while ((j >= d) && (array[j - d].CompareTo(array[j]) > 0))
-                    {
-                        Swap(ref array[j], ref array[j - d]);
-                        j = j - d;
-                    }
-                }
-
-                d = d / 2;
-            }
-
-            static void Swap(ref T a, ref T b)
-            {
-                var t = a;
-                a = b;
-                b = t;
-            }
+            array.ArrayTToInt(IntShellSortExtention.IntShellSort);
         }
     }
     public static class ListShellSortExtention
@@ -783,41 +545,9 @@ namespace SortLibrary
 
     public static class ArraySelectionSortExtention
     {
-        internal static void SelectionSort<T>(this T[] array, int currentIndex = 0) where T : IComparable<T>
-        {
-            if (currentIndex == array.Length)
-                return;
-
-            var index = IndexOfMin(currentIndex);
-            if (index != currentIndex)
-            {
-                Swap(array,index, currentIndex);
-            }
-
-            SelectionSort(array, currentIndex + 1);
-            int IndexOfMin(int n)
-            {
-                int result = n;
-                for (var i = n; i < array.Length; ++i)
-                {
-                    if (array[i].CompareTo(array[result]) < 0)
-                    {
-                        result = i;
-                    }
-                }
-
-                return result;
-            }
-            void Swap(T[] list, int aInd, int bInd)
-            {
-                T value = list[aInd];
-                list[aInd] = list[bInd];
-                list[bInd] = value;
-            }
-        }
         public static void SelectionSort<T>(this T[] array) where T : IComparable<T>
         {
-            array.SelectionSort();
+            array.ArrayTToInt(IntSelectionSortExtention.IntSelectionSort);
         }
     }
     public static class ListSelectionSortExtention
@@ -871,33 +601,7 @@ namespace SortLibrary
     {
         public static void GnomeSort<T>(this T[] unsortedArray) where T : IComparable<T>
         {
-            var index = 1;
-            var nextIndex = index + 1;
-
-            while (index < unsortedArray.Length)
-            {
-                if (unsortedArray[index - 1].CompareTo(unsortedArray[index]) < 0)
-                {
-                    index = nextIndex;
-                    nextIndex++;
-                }
-                else
-                {
-                    Swap(ref unsortedArray[index - 1], ref unsortedArray[index]);
-                    index--;
-                    if (index == 0)
-                    {
-                        index = nextIndex;
-                        nextIndex++;
-                    }
-                }
-            }
-            void Swap(ref T item1, ref T item2)
-            {
-                var temp = item1;
-                item1 = item2;
-                item2 = temp;
-            }
+            unsortedArray.ArrayTToInt(IntGnomeSortExtention.IntGnomeSort);
         }
     }
     public static class ListGnomeSortExtention
@@ -945,49 +649,7 @@ namespace SortLibrary
     {
         public static void CombSort<T>(this T[] array) where T : IComparable<T>
         {
-            var arrayLength = array.Length;
-            var currentStep = arrayLength - 1;
-
-            while (currentStep > 1)
-            {
-                for (int i = 0; i + currentStep < array.Length; i++)
-                {
-                    if (array[i].CompareTo(array[i + currentStep]) > 0)
-                    {
-                        Swap(ref array[i], ref array[i + currentStep]);
-                    }
-                }
-
-                currentStep = GetNextStep(currentStep);
-            }
-            for (var i = 1; i < arrayLength; i++)
-            {
-                var swapFlag = false;
-                for (var j = 0; j < arrayLength - i; j++)
-                {
-                    if (array[j].CompareTo(array[j + 1]) > 0)
-                    {
-                        Swap(ref array[j], ref array[j + 1]);
-                        swapFlag = true;
-                    }
-                }
-                if (!swapFlag)
-                {
-                    break;
-                }
-            }
-
-            void Swap(ref T value1, ref T value2)
-            {
-                var temp = value1;
-                value1 = value2;
-                value2 = temp;
-            }
-            int GetNextStep(int s)
-            {
-                s = s * 1000 / 1247;
-                return s > 1 ? s : 1;
-            }
+            array.ArrayTToInt(IntCombSortExtention.IntCombSort);
         }
     }
     public static class ListCombSortExtention
@@ -1051,615 +713,9 @@ namespace SortLibrary
     {
         public static void TimSort<T>(this T[] array) where T : IComparable<T>
         {
-            TimSortClass<T>.sort(array);
+            array.ArrayTToInt(IntTimSortExtention.IntTimSort);
         }
-        internal class TimSortClass<T> where T : IComparable<T>
-        {
 
-
-            private const int MIN_MERGE = 32;
-
-            private T[] a;
-
-
-
-            private const int MIN_GALLOP = 7;
-
-            private int minGallop = MIN_GALLOP;
-
-            private const int INITIAL_TMP_STORAGE_LENGTH = 256;
-
-            private T[] tmp;
-
-
-            private int stackSize = 0;
-            private int[] runBase;
-            private int[] runLen;
-
-            private TimSortClass(T[] a)
-            {
-                this.a = a;
-
-                var len = a.Length;
-                var newArray = (T[])new T[len < 2 * INITIAL_TMP_STORAGE_LENGTH ?
-                                                len >> 1 : INITIAL_TMP_STORAGE_LENGTH];
-                tmp = newArray;
-
-                int stackLen = (len < 120 ? 5 :
-                                len < 1542 ? 10 :
-                                len < 119151 ? 19 : 40);
-                runBase = new int[stackLen];
-                runLen = new int[stackLen];
-
-            }
-            public static void sort(T[] a)
-            {
-                sort(a, 0, a.Length);
-            }
-            public static void sort(T[] a, int lo, int hi)
-            {
-
-                rangeCheck(a.Length, lo, hi);
-                int nRemaining = hi - lo;
-                if (nRemaining < 2)
-                    return;
-
-                if (nRemaining < MIN_MERGE)
-                {
-                    int initRunLen = countRunAndMakeAscending(a, lo, hi);
-                    binarySort(a, lo, hi, lo + initRunLen);
-                    return;
-                }
-                var ts = new TimSortClass<T>(a);
-                int minRun = minRunLength(nRemaining);
-                do
-                {
-                    int runLen = countRunAndMakeAscending(a, lo, hi);
-
-                    if (runLen < minRun)
-                    {
-                        int force = nRemaining <= minRun ? nRemaining : minRun;
-                        binarySort(a, lo, lo + force, lo + runLen);
-                        runLen = force;
-                    }
-
-                    ts.pushRun(lo, runLen);
-                    ts.mergeCollapse();
-
-                    lo += runLen;
-                    nRemaining -= runLen;
-                } while (nRemaining != 0);
-
-                Debug.Assert(lo == hi);
-                ts.mergeForceCollapse();
-                Debug.Assert(ts.stackSize == 1);
-            }
-            private static void binarySort(T[] a, int lo, int hi, int start)
-            {
-                Debug.Assert(lo <= start && start <= hi);
-                if (start == lo)
-                    start++;
-                for (; start < hi; start++)
-                {
-                    var pivot = a[start];
-
-                    int left = lo;
-                    int right = start;
-                    Debug.Assert(left <= right);
-                    while (left < right)
-                    {
-                        int mid = (left + right) >> 1;
-                        if (pivot.CompareTo(a[mid]) < 0)
-                            right = mid;
-                        else
-                            left = mid + 1;
-                    }
-                    Debug.Assert(left == right);
-                    int n = start - left;
-                    switch (n)
-                    {
-                        case 2:
-                            a[left + 2] = a[left + 1];
-                            goto case 1;
-                        case 1:
-                            a[left + 1] = a[left];
-                            break;
-                        default:
-                            Array.Copy(a, left, a, left + 1, n);
-                            break;
-                    }
-                    a[left] = pivot;
-                }
-            }
-
-            private static int countRunAndMakeAscending(T[] a, int lo, int hi)
-            {
-                Debug.Assert(lo < hi);
-                int runHi = lo + 1;
-                if (runHi == hi)
-                    return 1;
-
-                if (a[runHi++].CompareTo(a[lo]) < 0)
-                {
-                    while (runHi < hi && a[runHi].CompareTo(a[runHi - 1]) < 0)
-                        runHi++;
-                    reverseRange(a, lo, runHi);
-                }
-                else
-                {
-                    while (runHi < hi && a[runHi].CompareTo(a[runHi - 1]) >= 0)
-                        runHi++;
-                }
-
-                return runHi - lo;
-            }
-
-            private static void reverseRange(T[] a, int lo, int hi)
-            {
-                hi--;
-                while (lo < hi)
-                {
-                    var t = a[lo];
-                    a[lo++] = a[hi];
-                    a[hi--] = t;
-                }
-            }
-
-            private static int minRunLength(int n)
-            {
-                Debug.Assert(n >= 0);
-                int r = 0;
-                while (n >= MIN_MERGE)
-                {
-                    r |= (n & 1);
-                    n >>= 1;
-                }
-                return n + r;
-            }
-
-            private void pushRun(int runBase, int runLen)
-            {
-                this.runBase[stackSize] = runBase;
-                this.runLen[stackSize] = runLen;
-                stackSize++;
-            }
-
-            private void mergeCollapse()
-            {
-                while (stackSize > 1)
-                {
-                    int n = stackSize - 2;
-                    if (n > 0 && runLen[n - 1] <= runLen[n] + runLen[n + 1])
-                    {
-                        if (runLen[n - 1] < runLen[n + 1])
-                            n--;
-                        mergeAt(n);
-                    }
-                    else if (runLen[n] <= runLen[n + 1])
-                    {
-                        mergeAt(n);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            private void mergeForceCollapse()
-            {
-                while (stackSize > 1)
-                {
-                    int n = stackSize - 2;
-                    if (n > 0 && runLen[n - 1] < runLen[n + 1])
-                        n--;
-                    mergeAt(n);
-                }
-            }
-
-            private void mergeAt(int i)
-            {
-                Debug.Assert(stackSize >= 2);
-                Debug.Assert(i >= 0);
-                Debug.Assert(i == stackSize - 2 || i == stackSize - 3);
-
-                int base1 = runBase[i];
-                int len1 = runLen[i];
-                int base2 = runBase[i + 1];
-                int len2 = runLen[i + 1];
-                Debug.Assert(len1 > 0 && len2 > 0);
-                Debug.Assert(base1 + len1 == base2);
-
-                runLen[i] = len1 + len2;
-                if (i == stackSize - 3)
-                {
-                    runBase[i + 1] = runBase[i + 2];
-                    runLen[i + 1] = runLen[i + 2];
-                }
-                stackSize--;
-                int k = gallopRight(a[base2], a, base1, len1, 0);
-                Debug.Assert(k >= 0);
-                base1 += k;
-                len1 -= k;
-                if (len1 == 0)
-                    return;
-
-                len2 = gallopLeft(a[base1 + len1 - 1], a, base2, len2, len2 - 1);
-                Debug.Assert(len2 >= 0);
-                if (len2 == 0)
-                    return;
-
-                if (len1 <= len2)
-                    mergeLo(base1, len1, base2, len2);
-                else
-                    mergeHi(base1, len1, base2, len2);
-            }
-
-            private static int gallopLeft(T key, T[] a, int basei, int len, int hint)
-            {
-                Debug.Assert(len > 0 && hint >= 0 && hint < len);
-                int lastOfs = 0;
-                int ofs = 1;
-                if (key.CompareTo(a[basei + hint]) > 0)
-                {
-                    int maxOfs = len - hint;
-                    while (ofs < maxOfs && key.CompareTo(a[basei + hint + ofs]) > 0)
-                    {
-                        lastOfs = ofs;
-                        ofs = (ofs << 1) + 1;
-                        if (ofs <= 0)
-                            ofs = maxOfs;
-                    }
-                    if (ofs > maxOfs)
-                        ofs = maxOfs;
-
-                    lastOfs += hint;
-                    ofs += hint;
-                }
-                else
-                {
-                    int maxOfs = hint + 1;
-                    while (ofs < maxOfs && key.CompareTo(a[basei + hint - ofs]) <= 0)
-                    {
-                        lastOfs = ofs;
-                        ofs = (ofs << 1) + 1;
-                        if (ofs <= 0)
-                            ofs = maxOfs;
-                    }
-                    if (ofs > maxOfs)
-                        ofs = maxOfs;
-
-                    int tmp = lastOfs;
-                    lastOfs = hint - ofs;
-                    ofs = hint - tmp;
-                }
-                Debug.Assert(-1 <= lastOfs && lastOfs < ofs && ofs <= len);
-
-                lastOfs++;
-                while (lastOfs < ofs)
-                {
-                    int m = lastOfs + ((ofs - lastOfs) >> 1);
-
-                    if (key.CompareTo(a[basei + m]) > 0)
-                        lastOfs = m + 1;
-                    else
-                        ofs = m;
-                }
-                Debug.Assert(lastOfs == ofs);
-                return ofs;
-            }
-
-            private static int gallopRight(T key, T[] a, int basei, int len, int hint)
-            {
-                Debug.Assert(len > 0 && hint >= 0 && hint < len);
-
-                int ofs = 1;
-                int lastOfs = 0;
-                if (key.CompareTo(a[basei + hint]) < 0)
-                {
-                    int maxOfs = hint + 1;
-                    while (ofs < maxOfs && key.CompareTo(a[basei + hint - ofs]) < 0)
-                    {
-                        lastOfs = ofs;
-                        ofs = (ofs << 1) + 1;
-                        if (ofs <= 0)
-                            ofs = maxOfs;
-                    }
-                    if (ofs > maxOfs)
-                        ofs = maxOfs;
-
-                    int tmp = lastOfs;
-                    lastOfs = hint - ofs;
-                    ofs = hint - tmp;
-                }
-                else
-                {
-                    int maxOfs = len - hint;
-                    while (ofs < maxOfs && key.CompareTo(a[basei + hint + ofs]) >= 0)
-                    {
-                        lastOfs = ofs;
-                        ofs = (ofs << 1) + 1;
-                        if (ofs <= 0)
-                            ofs = maxOfs;
-                    }
-                    if (ofs > maxOfs)
-                        ofs = maxOfs;
-
-                    lastOfs += hint;
-                    ofs += hint;
-                }
-                Debug.Assert(-1 <= lastOfs && lastOfs < ofs && ofs <= len);
-
-                lastOfs++;
-                while (lastOfs < ofs)
-                {
-                    int m = lastOfs + ((ofs - lastOfs) >> 1);
-
-                    if (key.CompareTo(a[basei + m]) < 0)
-                        ofs = m;
-                    else
-                        lastOfs = m + 1;
-                }
-                Debug.Assert(lastOfs == ofs);
-                return ofs;
-            }
-
-            private void mergeLo(int base1, int len1, int base2, int len2)
-            {
-                Debug.Assert(len1 > 0 && len2 > 0 && base1 + len1 == base2);
-
-                var a = this.a;
-                var tmp = ensureCapacity(len1);
-                Array.Copy(a, base1, tmp, 0, len1);
-
-                int cursor1 = 0;
-                int cursor2 = base2;
-                int dest = base1;
-
-                a[dest++] = a[cursor2++];
-                if (--len2 == 0)
-                {
-                    Array.Copy(tmp, cursor1, a, dest, len1);
-                    return;
-                }
-                if (len1 == 1)
-                {
-                    Array.Copy(a, cursor2, a, dest, len2);
-                    a[dest + len2] = tmp[cursor1];
-                    return;
-                }
-
-                int minGallop = this.minGallop;
-            outer:
-                while (true)
-                {
-                    int count1 = 0;
-                    int count2 = 0;
-
-                    do
-                    {
-                        Debug.Assert(len1 > 1 && len2 > 0);
-                        if (a[cursor2].CompareTo(tmp[cursor1]) < 0)
-                        {
-                            a[dest++] = a[cursor2++];
-                            count2++;
-                            count1 = 0;
-                            if (--len2 == 0)
-                                goto outer;
-                        }
-                        else
-                        {
-                            a[dest++] = tmp[cursor1++];
-                            count1++;
-                            count2 = 0;
-                            if (--len1 == 1)
-                                goto outer;
-                        }
-                    } while ((count1 | count2) < minGallop);
-
-                    do
-                    {
-                        Debug.Assert(len1 > 1 && len2 > 0);
-                        count1 = gallopRight(a[cursor2], tmp, cursor1, len1, 0);
-                        if (count1 != 0)
-                        {
-                            Array.Copy(tmp, cursor1, a, dest, count1);
-                            dest += count1;
-                            cursor1 += count1;
-                            len1 -= count1;
-                            if (len1 <= 1)
-                                goto outer;
-                        }
-                        a[dest++] = a[cursor2++];
-                        if (--len2 == 0)
-                            goto outer;
-
-                        count2 = gallopLeft(tmp[cursor1], a, cursor2, len2, 0);
-                        if (count2 != 0)
-                        {
-                            Array.Copy(a, cursor2, a, dest, count2);
-                            dest += count2;
-                            cursor2 += count2;
-                            len2 -= count2;
-                            if (len2 == 0)
-                                goto outer;
-                        }
-                        a[dest++] = tmp[cursor1++];
-                        if (--len1 == 1)
-                            goto outer;
-                        minGallop--;
-                    } while (count1 >= MIN_GALLOP | count2 >= MIN_GALLOP);
-                    if (minGallop < 0)
-                        minGallop = 0;
-                    minGallop += 2;
-                }
-                this.minGallop = minGallop < 1 ? 1 : minGallop;
-
-                if (len1 == 1)
-                {
-                    Debug.Assert(len2 > 0);
-                    Array.Copy(a, cursor2, a, dest, len2);
-                    a[dest + len2] = tmp[cursor1];
-                }
-                else if (len1 == 0)
-                {
-                    throw new ArgumentException(
-                        "Comparison method violates its general contract!");
-                }
-                else
-                {
-                    Debug.Assert(len2 == 0);
-                    Debug.Assert(len1 > 1);
-                    Array.Copy(tmp, cursor1, a, dest, len1);
-                }
-            }
-
-            private void mergeHi(int base1, int len1, int base2, int len2)
-            {
-                Debug.Assert(len1 > 0 && len2 > 0 && base1 + len1 == base2);
-                T[] a = this.a;
-                T[] tmp = ensureCapacity(len2);
-                Array.Copy(a, base2, tmp, 0, len2);
-
-                int cursor1 = base1 + len1 - 1;
-                int cursor2 = len2 - 1;
-                int dest = base2 + len2 - 1;
-
-
-                a[dest--] = a[cursor1--];
-                if (--len1 == 0)
-                {
-                    Array.Copy(tmp, 0, a, dest - (len2 - 1), len2);
-                    return;
-                }
-                if (len2 == 1)
-                {
-                    dest -= len1;
-                    cursor1 -= len1;
-                    Array.Copy(a, cursor1 + 1, a, dest + 1, len1);
-                    a[dest] = tmp[cursor2];
-                    return;
-                }
-                int minGallop = this.minGallop;
-            outer:
-                while (true)
-                {
-                    int count1 = 0;
-                    int count2 = 0;
-
-                    do
-                    {
-                        Debug.Assert(len1 > 0 && len2 > 1);
-                        if (tmp[cursor2].CompareTo(a[cursor1]) < 0)
-                        {
-                            a[dest--] = a[cursor1--];
-                            count1++;
-                            count2 = 0;
-                            if (--len1 == 0)
-                                goto outer;
-                        }
-                        else
-                        {
-                            a[dest--] = tmp[cursor2--];
-                            count2++;
-                            count1 = 0;
-                            if (--len2 == 1)
-                                goto outer;
-                        }
-                    } while ((count1 | count2) < minGallop);
-
-                    do
-                    {
-                        Debug.Assert(len1 > 0 && len2 > 1);
-                        count1 = len1 - gallopRight(tmp[cursor2], a, base1, len1, len1 - 1);
-                        if (count1 != 0)
-                        {
-                            dest -= count1;
-                            cursor1 -= count1;
-                            len1 -= count1;
-                            Array.Copy(a, cursor1 + 1, a, dest + 1, count1);
-                            if (len1 == 0)
-                                goto outer;
-                        }
-                        a[dest--] = tmp[cursor2--];
-                        if (--len2 == 1)
-                            goto outer;
-
-                        count2 = len2 - gallopLeft(a[cursor1], tmp, 0, len2, len2 - 1);
-                        if (count2 != 0)
-                        {
-                            dest -= count2;
-                            cursor2 -= count2;
-                            len2 -= count2;
-                            Array.Copy(tmp, cursor2 + 1, a, dest + 1, count2);
-                            if (len2 <= 1)  // len2 == 1 || len2 == 0
-                                goto outer;
-                        }
-                        a[dest--] = a[cursor1--];
-                        if (--len1 == 0)
-                            goto outer;
-                        minGallop--;
-                    } while (count1 >= MIN_GALLOP | count2 >= MIN_GALLOP);
-                    if (minGallop < 0)
-                        minGallop = 0;
-                    minGallop += 2;
-                }
-                this.minGallop = minGallop < 1 ? 1 : minGallop;
-
-                if (len2 == 1)
-                {
-                    Debug.Assert(len1 > 0);
-                    dest -= len1;
-                    cursor1 -= len1;
-                    Array.Copy(a, cursor1 + 1, a, dest + 1, len1);
-                    a[dest] = tmp[cursor2];
-                }
-                else if (len2 == 0)
-                {
-                    throw new ArgumentException(
-                        "Comparison method violates its general contract!");
-                }
-                else
-                {
-                    Debug.Assert(len1 == 0);
-                    Debug.Assert(len2 > 0);
-                    Array.Copy(tmp, 0, a, dest - (len2 - 1), len2);
-                }
-            }
-
-            private T[] ensureCapacity(int minCapacity)
-            {
-                if (tmp.Length < minCapacity)
-                {
-                    int newSize = minCapacity;
-                    newSize |= newSize >> 1;
-                    newSize |= newSize >> 2;
-                    newSize |= newSize >> 4;
-                    newSize |= newSize >> 8;
-                    newSize |= newSize >> 16;
-                    newSize++;
-
-                    if (newSize < 0)
-                        newSize = minCapacity;
-                    else
-                        newSize = Math.Min(newSize, a.Length >> 1);
-
-                    tmp = new T[newSize];
-                }
-                return tmp;
-            }
-
-            private static void rangeCheck(int arrayLen, int fromIndex, int toIndex)
-            {
-                if (fromIndex > toIndex)
-                    throw new ArgumentException("fromIndex(" + fromIndex +
-                               ") > toIndex(" + toIndex + ")");
-                if (fromIndex < 0)
-                    throw new ArgumentOutOfRangeException("fromIndex", fromIndex.ToString());
-                if (toIndex > arrayLen)
-                    throw new ArgumentOutOfRangeException("toIndex", toIndex.ToString());
-            }
-        }
     }
     public static class ListTimSortExtention
     {
@@ -2868,13 +1924,126 @@ namespace SortLibrary
         }
     }
 
-    public class AmericanFlagSortExtention
+
+    public static class ArrayRadixSortExtention
     {
-        private int get_radix_val(int x, int digit, int radix)
+        public static void RadixSort<T>(this T[] array) where T: IComparable<T>
+        {
+            array.ArrayTToInt(IntRadixSortExtention.IntRadixSort);
+        }
+    }
+    public static class ListRadixSortExtention
+    {
+        public static void RadixSort<T>(this List<T> array) where T:IComparable<T>
+        {
+            array.Cloner(ArrayRadixSortExtention.RadixSort);
+        }
+    }
+    public static class IntRadixSortExtention
+    {
+        class Radix
+        {
+            public static int getMax(int[] arr, int n)
+            {
+                int mx = arr[0];
+                for (int i = 1; i < n; i++)
+                    if (arr[i] > mx)
+                        mx = arr[i];
+                return mx;
+            }
+            public static void countSort(int[] arr, int n, int exp)
+            {
+                int[] output = new int[n];
+                int i;
+                int[] count = new int[10];
+
+                for (i = 0; i < 10; i++)
+                    count[i] = 0;
+
+                for (i = 0; i < n; i++)
+                    count[(arr[i] / exp) % 10]++;
+
+                for (i = 1; i < 10; i++)
+                    count[i] += count[i - 1];
+
+                for (i = n - 1; i >= 0; i--)
+                {
+                    output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+                    count[(arr[i] / exp) % 10]--;
+                }
+
+                for (i = 0; i < n; i++)
+                    arr[i] = output[i];
+            }
+
+            public static void radixsort(int[] arr, int n)
+            {
+                int m = getMax(arr, n);
+
+                for (int exp = 1; m / exp > 0; exp *= 10)
+                    countSort(arr, n, exp);
+            }
+        }
+        public static void IntRadixSort(this int[] array)
+        {
+            Radix.radixsort(array, array.Length);
+        }
+    }
+
+
+    public static class ArrayCountingSortExtention
+    {
+        public static void CountingSort<T>(this T[] array) where T:IComparable<T>
+        {
+            array.ArrayTToInt(IntCountingSortExtention.CountingSort);
+        }
+    }
+    public static class ListCountingSortExtention
+    {
+        public static void CountingSort<T>(this T[] array) where T : IComparable<T>
+        {
+            array.ArrayTToInt(IntCountingSortExtention.CountingSort);
+        }
+    }
+    public static class IntCountingSortExtention
+    {
+        public static void CountingSort(this int[] arr)
+        {
+            int max = arr.Max();
+            int min = arr.Min();
+            int range = max - min + 1;
+            int[] count = new int[range];
+            int[] output = new int[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                count[arr[i] - min]++;
+            }
+            for (int i = 1; i < count.Length; i++)
+            {
+                count[i] += count[i - 1];
+            }
+            for (int i = arr.Length - 1; i >= 0; i--)
+            {
+                output[count[arr[i] - min] - 1] = arr[i];
+                count[arr[i] - min]--;
+            }
+            for (int i = 0; i < arr.Length; i++)
+            {
+                arr[i] = output[i];
+            }
+        }
+        
+    }
+
+
+    //недоделаные сортировки
+    public static class AmericanFlagSortExtention
+    {
+        private static int get_radix_val(int x, int digit, int radix)
         {
             return (int)(Math.Floor((double)(x / radix * digit))) % radix;
         }
-        private int[] compute_offsets(int[] a_list, int start, int end, int digit, int radix)
+        private static int[] compute_offsets(int[] a_list, int start, int end, int digit, int radix)
         {
             int[] counts = new int[radix];
             for (int i = start; i < end; i++) //for i in range(start, end)
@@ -2893,7 +2062,7 @@ namespace SortLibrary
             return offsets;
         }
 
-        private void swap(ref int[] a_list, int[] offsets, int start, int end, int digit, int radix)
+        private static void swap(ref int[] a_list, int[] offsets, int start, int end, int digit, int radix)
         {
             int i = start;
             int[] next_free = new int[offsets.Length];
@@ -2919,7 +2088,7 @@ namespace SortLibrary
                 next_free[radix_val] += 1;
             }
         }
-        private void american_flag_sort_helper(ref int[] a_list, int start, int end, int digit, int radix)
+        private static void american_flag_sort_helper(ref int[] a_list, int start, int end, int digit, int radix)
         {
             int[] offsets = compute_offsets(a_list, start, end, digit, radix);
             swap(ref a_list, offsets, start, end, digit, radix);
@@ -2928,14 +2097,86 @@ namespace SortLibrary
             for (int i = 0; i < offsets.Length - 1; i++)
                 american_flag_sort_helper(ref a_list, offsets[i], offsets[i + 1], digit - 1, radix);
         }
-        public void american_flag_sort(int[] a_list, int radix)
+        public static void american_flag_sort(this int[] a_list, int radix)
         {
             int max_val = a_list.Max();
             int max_digit = (int)(Math.Floor(Math.Log(max_val, radix)));
-            american_flag_sort_helper(ref a_list, 0, a_list.Length, max_digit, radix);
+            american_flag_sort_helper(ref a_list, 0, a_list.Length - 1, max_digit, radix);
         }
     }
+    public static class BucketSortExtention
+    {
+        class Bucket
+        {
+            public static void Sort(ref int[] array)
+            {
+                List<List<int>> buckets = new List<List<int>>();
+                InitializeBuckets(buckets);
 
+                Scatter(array, buckets);
+
+                int i = 0;
+                foreach (List<int> bucket in buckets)
+                {
+                    int[] arr = bucket.ToArray();
+                    InsertionSort(arr);
+
+                    foreach (int d in arr)
+                    {
+                        array[i++] = d;
+                    }
+                }
+            }
+
+            private static void Scatter(int[] array, List<List<int>> buckets)
+            {
+                foreach (int value in array)
+                {
+                    int bucketNumber = GetBucketNumber(value);
+                    buckets[bucketNumber].Add(value);
+                }
+            }
+
+            private static void InsertionSort(int[] array)
+            {
+                int j;
+                int temp;
+
+                for (int i = 1; i < array.Length; i++)
+                {
+                    j = i;
+                    while (j > 0 && array[j] < array[j - 1])
+                    {
+                        temp = array[j];
+                        array[j] = array[j - 1];
+                        array[j - 1] = temp;
+                        j--;
+                    }
+                }
+            }
+
+            private static int GetBucketNumber(int value)
+            {
+                int val = value * 10;
+                int bucketNumber = val;
+                return bucketNumber;
+            }
+
+            private static void InitializeBuckets(List<List<int>> buckets)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    List<int> a = new List<int>();
+                    buckets.Add(a);
+                }
+            }
+        }
+        public static void BucketSort(this int[] array)
+        {
+            Bucket.Sort(ref array);
+        }
+    }
+    
     public static class ArrayTools
     {
         public static bool IsSortedAscending<TSource>(this IList<TSource> dataSource) where TSource : IComparable
@@ -2950,15 +2191,27 @@ namespace SortLibrary
 
             return true;
         }
-        static int[] GetRandomArray(this int[] array, int minValue, int maxValue)
+        public static void GetRandomArray(this int[] array, int minValue, int maxValue)
         {
             var r = new Random();
             for (var i = 0; i < array.Length; i++)
             {
                 array[i] = r.Next(minValue, maxValue);
             }
+        }
 
-            return array;
+        internal static void ArrayTToInt<T>(this T[] array, Action<int[]> operation)where T : IComparable<T>
+        {
+            int[] arraycopy = new int[array.Length];
+            for (int i = 0; i < array.Length; i++)
+            {
+                arraycopy[i] = Operator.Convert<T, int>(array[i]);
+            }
+            operation.Invoke(arraycopy);
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = Operator.Convert<int, T>(arraycopy[i]);
+            }
         }
         internal static void Cloner<T>(this List<T> arr1, Action<T[]> operation) where T : IComparable<T>
         {
@@ -2972,6 +2225,40 @@ namespace SortLibrary
                 {
                     arr1.Add(newarr[i]);
                 }
+            }
+        }
+    }
+
+    public static class Bantchmark
+    {
+        public static void Test(int[] testarray, params Action<int[]>[] actions)
+        {
+            List<double> milsec = new List<double>();
+            List<string> lst = new List<string>();
+            var myStopwatch = new System.Diagnostics.Stopwatch();
+            for (int i = 0; i < actions.Length; i++)
+            {
+                try
+                {
+                    myStopwatch.Start();
+                    actions[i].Invoke(testarray);
+                    myStopwatch.Stop();
+                    if(!testarray.IsSortedAscending())
+                    {
+                        throw new Exception("NoSortedExeption");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Метод {actions[i].ToString()} не работает по причине {e.Message}");
+                }
+                milsec.Add(myStopwatch.Elapsed.TotalMilliseconds);
+                lst.Add(actions[i].ToString() + " " + myStopwatch.Elapsed.TotalMilliseconds.ToString());
+                myStopwatch.Reset();
+            }
+            foreach (var item in lst)
+            {
+                Console.WriteLine(item);
             }
         }
     }
