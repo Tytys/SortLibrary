@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
 namespace SortLibrary
 {
@@ -2772,7 +2774,7 @@ end;
         }
     }
 
-    public static class Bantchmark
+    public static class MyBantchmark
     {
         struct info
         {
@@ -2820,4 +2822,121 @@ end;
             Console.WriteLine(name);
         }
     }
+    public class tester
+    {
+        public tester()
+        {
+            BenchmarkRunner.Run<tester>();
+        }
+        [Benchmark(Description = "быстрая сортировка")]
+        public void quick()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntQuickSortExtention.IntQuickSort(array);
+        }
+
+        [Benchmark(Description = "сортировка вставками")]
+        public void insertion()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntInsertionSortExtention.InsertionSort(array);
+        }
+        [Benchmark(Description = "сортирвка бусами")]
+        public void bead()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntBeadSort.BeadSort(array);
+        }
+        [Benchmark(Description = "болотная сортировка")]
+        public void bogo()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntBogoSortExtention.IntBogoSort(array);
+        }
+        [Benchmark(Description = "comb сортировка")]
+        public void comb()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntCombSortExtention.IntCombSort(array);
+        }
+        [Benchmark(Description = "сортировка счетом")]
+        public void counting()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntCountingSortExtention.CountingSort(array);
+        }
+        [Benchmark(Description = "gnome сортировка")]
+        public void gnome()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntGnomeSortExtention.IntGnomeSort(array);
+        }
+        [Benchmark(Description = "сортировка кучей")]
+        public void heap()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntHeapSortExtention.IntHeapSort(array);
+        }
+        [Benchmark(Description = "сортировка слиянием")]
+        public void merge()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntMergeSortExtention.IntMergeSort(array);
+        }
+        [Benchmark(Description = "блинная сортировка")]
+        public void pancake()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntPancakeSortExtention.IntPancakeSort(array);
+        }
+        [Benchmark(Description = "радикс сортировка")]
+        public void radix()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntRadixSortExtention.IntRadixSort(array);
+        }
+        [Benchmark(Description = "сортировка выбором")]
+        public void selection()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntSelectionSortExtention.IntSelectionSort(array);
+        }
+        [Benchmark(Description = "шейкерная сортировка")]
+        public void shaker()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntShakerSortExtention.IntShakerSort(array);
+        }
+        [Benchmark(Description = "шелл сортировка")]
+        public void shell()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntShellSortExtention.IntShellSort(array);
+        }
+        [Benchmark(Description = "smooth сортировка")]
+        public void smooth()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntSmoothSortExtention.IntSmoothSort(array);
+        }
+        [Benchmark(Description = "сортировка ложками")]
+        public void stooge()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntStoogeSortExtention.IntStoogeSort(array);
+        }
+        [Benchmark(Description = "тим сортировка")]
+        public void tim()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntTimSortExtention.IntTimSort(array);
+        }
+        [Benchmark(Description = "сортировка деревом")]
+        public void tree()
+        {
+            int[] array = { 2, 1, 3, 7, 9, 8 };
+            IntTreeSortExtention.TreeSort(array);
+        }
+    }
 }
+
