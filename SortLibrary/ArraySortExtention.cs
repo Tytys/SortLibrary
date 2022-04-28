@@ -2000,9 +2000,9 @@ namespace SortLibrary
     }
     public static class ListCountingSortExtention
     {
-        public static void CountingSort<T>(this T[] array) where T : IComparable<T>
+        public static void CountingSort<T>(this List<T> array) where T : IComparable<T>
         {
-            array.ArrayTToInt(IntCountingSortExtention.CountingSort);
+            array.Cloner(ArrayCountingSortExtention.CountingSort);
         }
     }
     public static class IntCountingSortExtention
@@ -2036,8 +2036,91 @@ namespace SortLibrary
     }
 
 
+    public static class ArrayBeadSort 
+    {
+        public static void BeadSort<T>(this T[] array) where T : IComparable<T>
+        {
+            array.ArrayTToInt(IntBeadSort.BeadSort);
+        }
+    }
+    public static class ListBeadSort
+    {
+        public static void BeadSort<T>(this List<T> array) where T:IComparable<T>
+        {
+            array.Cloner(ArrayBeadSort.BeadSort);
+        }
+    }
+    public static class IntBeadSort
+    {
+
+        public static void BeadSort(this int[] arr)
+        {
+            int max = arr[0];
+            for (int i = 1; i < arr.Length; i++)
+                if (arr[i] > max)
+                    max = arr[i];
+
+            char[,] grid = new char[arr.Length, max];
+            int[] levelcount = new int[max];
+            for (int i = 0; i < max; i++)
+            {
+                levelcount[i] = 0;
+                for (int j = 0; j < arr.Length; j++)
+                    grid[j, i] = '_';
+            }
+            for (int i = 0; i < arr.Length; i++)
+            {
+                int num = arr[i];
+                for (int j = 0; num > 0; j++)
+                {
+                    grid[levelcount[j]++, j] = '*';
+                    num--;
+                }
+            }
+            int[] sorted = new int[arr.Length];
+            for (int i = 0; i < arr.Length; i++)
+            {
+                int putt = 0;
+                for (int j = 0; j < max && grid[arr.Length - 1 - i, j] == '*'; j++)
+                    putt++;
+                sorted[i] = putt;
+            }
+
+            arr = sorted;
+        }
+    }
+
+
+    public static class IntBogobogosort
+    {
+
+        public static void sort(this int[] list)
+        {
+            bool True = true;
+            if (list.Length <= 1) return;
+            while (True)
+            {
+                list = Shuffle(list);
+                True = !list.IsSortedAscending();
+            }
+
+            static int[] Shuffle(int[] list)
+            {
+                Random rnd = new Random();
+                for (int i = 0; i < list.Length; i++)
+                {
+                    int k = rnd.Next(0, i);
+                    int value = list[k];
+                    list[k] = list[i];
+                    list[i] = value;
+                }
+                return list;
+            }
+        }
+    }
+
     //недоделаные сортировки
-    public static class AmericanFlagSortExtention
+    internal static class AmericanFlagSortExtention
     {
         private static int get_radix_val(int x, int digit, int radix)
         {
@@ -2104,7 +2187,7 @@ namespace SortLibrary
             american_flag_sort_helper(ref a_list, 0, a_list.Length - 1, max_digit, radix);
         }
     }
-    public static class BucketSortExtention
+    internal static class BucketSortExtention
     {
         class Bucket
         {
@@ -2176,7 +2259,467 @@ namespace SortLibrary
             Bucket.Sort(ref array);
         }
     }
-    
+
+    //class ABS
+    //{
+    //    long RT;  /* Таблица записей */
+    //    long LT; /* Таблица символов */
+
+    //    void ABCsort(int keys)
+    //    { /* Количество используемых ключевых полей */
+
+    //        void process(int, int);
+    //        long register i, j, recno;
+    //        int register c;
+    //        int nodup = noduplicates;
+    //        long start, step, stop;
+
+    //        /* Выделяем хранилища под внутренние таблицы */
+    //        LT = lmatrix(1, keys, alphamin, alphamax);
+    //        RT = lvector(1, N);
+
+    //        /* Инициализация таблицы символов: */
+    //        for (j = alphamin; j <= alphamax; j++)
+    //        {
+    //            for (i = 1; i <= keys; i++)
+    //                LT[i][j] = 0;
+    //        }
+
+    //        /* Обеспечиваем стабильность сортировки */
+    //        if ((keys & 1) ^ nodup)
+    //        {
+    //            start = N; stop = 0; step = -1;
+    //        }
+    //        else
+    //        {
+    //            start = 1;
+    //            stop = N + 1;
+    //            step = 1;
+    //        }
+
+    //        /* Этап 1 */
+    //        /* Группируем слова по первой букве */
+    //        for (recno = start; recno != stop; recno += step)
+    //        {
+    //            c = GetNextField(recno, 1);
+    //            RT[recno] = LT[1][c];
+    //            LT[1][c] = recno;
+    //        }
+
+    //        /* Запускаем процесс уточнения положения записей в списке. */
+    //        process(1, keys);
+
+    //        free_lmatrix(LT, 1, keys, alphamin, alphamax);
+    //        free_lvector(RT, 1, N);
+
+    //    }
+
+    //    /* ======================================================== */
+
+    //    /* Функция обработки данных после 1-го этапа: */
+    //    /* Перегруппировываем слова, переходя от одной буквы к следующей */
+    //    void process(int level, int keys)
+    //    {
+
+    //        long i, newlevel, nextrec, recno;
+    //        int nodup = noduplicates;
+    //        unsigned char c;
+
+    //        /* Цикл по алфавиту */
+    //        for (i = alphamin; i <= alphamax; i++)
+    //        {
+
+    //            /* Ищем использование i-й буквы */
+    //            recno = LT[level][i];
+    //            LT[level][i] = 0;
+
+    //            /* Сканируем ветвь для этой буквы */
+    //            while (recno != 0)
+    //            {
+    //                /* i-й символ используется только однажды, значит  
+    //                отсортированная часть массива пополнилась новым элементом */
+    //                if (RT[recno] == 0)
+    //                {
+    //                    PutCurrRecord(recno);
+    //                    recno = 0;
+    //                    continue;
+    //                }
+    //                else
+    //                {
+    //                    /* В случае многократного использования i-го символа: */
+    //                    if (level == keys)
+    //                    {
+    //                        /* Вывод всех данных на этом уровне: */
+    //                        while (recno != 0)
+    //                        {
+    //                            /* Добавляем текущую запись в таблицу индексов */
+    //                            PutCurrRecord(recno);
+    //                            recno = RT[recno];
+    //                            if (nodup) recno = 0;
+    //                        }
+    //                    }
+    //                    else
+    //                    {
+    //                        /* Продолжать уточнять порядок слов:*/
+    //                        /* опускаемся на уровень вниз */
+    //                        newlevel = level + 1;
+    //                        while (recno != 0)
+    //                        {
+    //                            nextrec = RT[recno];
+    //                            c = GetNextField(recno, newlevel);
+    //                            RT[recno] = LT[newlevel][c];
+    //                            LT[newlevel][c] = recno;
+    //                            recno = nextrec;
+    //                        }
+    //                        /* Продолжаем процесс уточнения */
+    //                        process(newlevel, keys);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+    /* SUBJSort
+     * Приветствую Вас всезнающий ALL
+
+Поделитесь вашими впечатлениями о SUBJ, интересует его сравнение с
+известными сортировками (quick, shell, ....) и оценка эффективности
+аля как в книжке Вирта.
+
+Допустим что памяти хватит ;-)
+
+Это страничка из I-NET, адреса там не было :-(
+
+=== Cut ===
+A revolutionary new sort from John Cohen
+
+Introduction
+
+Yes, I know I'm not the first to claim I have created one of the
+fastest sorts, however please do not dismiss me before at least
+reading this paragraph. I have not reinvented the postal sort or
+anything like that. I have invented a new sort for linked lists
+which runs in O(n) = n ln n time as any good sort should. However,
+although the big-O is similar to many other sorts, this runs
+consistently faster. I have tested it against the bubble (hah),
+selection, insertion, merge, quick, shell, and heap sorts.
+The J sort does not need special keys; the only thing you need
+is a comparison function which determines if one data point is
+less then, equal to, or greater then another. Thus, the sort is
+applicable in any sorting situation.
+
+General Overview
+
+Here's the general idea. We have a doubly-linked list of elements
+which we would like to sort. If there are a trivial number of
+elements (two or fewer), it's trivial to sort them. If there are
+fewer then some fixed number (studies show this should be around 35),
+then the Strand sort is exectued. This is a sort which I devised that
+takes advantage of natural runs in the data, and is very fast for small
+numbers of elements. However, it is an n-squared sort, so the speed
+advantage is lost with a sizeable number of elements. Therefore, with
+any more then that fixed number of elements, another sort of my own
+devising called the Shuffle sort is executed. This extracts a subset
+of the elements into a new list, and then inserts the other elements
+into this list using a very fast insertion routine. Then, to sort the
+new list we can break the chore into a great many smaller sorting taskes,
+which are accomplished with recursion.
+
+Advantages & Limitations
+
+For every size of list, from 2 elements to 5000, the J sort preformed
+faster by a factor of 2 or more. Also, because most of the memory-related
+activity is simply rearranging pointers in a linked list, it is very
+conservative when it comes to memory usage. However, I would say that
+just about any other sort would take less memory. Also, because of the
+dynamic nature of the algorithm, it is not fesible to use the J sort on
+data which are not in RAM. Therefore, unless all the data points can fit
+into memory at once, the J sort is probably not a good choice, although
+if you were doing a merge or quick sort, you could use the J sort when
+the number of elements gets small enough to squeeze them into memory.
+An far as parallel processing goes, the J sort was devised on a serial
+computer, but it is actually is quite suited for parallel processing.
+If anyone tries this, please let me know.
+
+The Algorithm
+
+As outlined in the General Overview, There are two main parts to
+the J sort: the Strand sort which runs with small numbers of elements,
+and the Shuffle sort.
+
+First the Strand sort. Studies show that about 30 to 40 is a good threshold
+for using Strand over the Shuffle. However, this number could change on
+different platforms, languages, and implementations. After dealing with
+the trivial cases, the Strand sort pulls out the first element in the
+list, and uses it as the first element of a new list called the sub-list.
+Then the remainder of the original list is scanned, and every time an
+element is found which is greater then the last element of the sub-list,
+it is appended to the sub-list, and removed from the original. Now we have
+extracted a sorted sub-list from the original list. Putting that list aside,
+we then extract another sub-list in the same manner. Then the two sub-lists
+are merged. The process of extracting a sub-list and merging with the
+others is continued until the original list is exhausted. The Strand sort
+takes advantage of natural runs, or many successive elements which are
+already in order. Now the Shuffle sort. Let n be the number of elements.
+First the first n/8 elements are removed and placed into another list called
+the key list. This list is then sorted recursiviy Then an array of n/8
+pointers is created, and these are set to point to the n/8 elements in the
+key list, in order. Now the remaining 7n/8 elements of the list is inserted
+into the key list by making a binary search using the array. Now we have n/8
+unordered lists between the n/8 key elements which are sorted. These lists
+are then sorted recursiviy. Then the key list is totally sorted. This is very
+fast because the array makes the binary search very fast, and the n/8 lists
+are all only 8 elements long on the average no matter what the size of the
+original list. Also, the insertion algorithm preserves natural runs which
+the Strand sort can take advantage of. Here is the algorithm:
+
+The J Sort
+
+I. Let L be the list to be sorted in place, and let n be the number of
+elements in L.
+
+II. IF n < StrandThreshold, use the Strand sort,
+otherwise use the Shuffle sort.
+
+III. Strand Sort
+A. If n = 0, return
+B. If n = 1, put the element in L into S and return
+C. If n = 2, compare the elements, switch if necessary, and return
+D. Let S be a list which will hold the sorted elements of L, and let B
+be a list which will be the sub-list
+E. Loop through the following while there are still elements in L:
+1. Put the first element of L into B
+2. Loop through the following letting p point to the first, second,..., last
+element of L,
+a. If p > last element of BД append p to B, removing from L.
+3. Merge B into S
+F. Put S into L, and return
+
+IV. Shuffle Sort
+
+Let K be a list of the first n/8 elements of L (remove from L)
+Sort K recursivly
+Let A be an array of n/8 pointers to elements, and set them to the
+elements of K
+D. Let B be an array of n/8+1 empty lists. These correspond to the
+lists which are inbetween, proceed, and proceed the elements in K
+E. For the remaining elements in L, append each to the appropriate
+list in B as determined by a binary search in A.
+F. recursiviy sort even'' list in B
+G. Construct the original list by appending the elements of the first
+list in B, then the first element of K, then the second list in B,
+then the second element of K, ..., then the nth element of K,
+then the n+lth element of B, and return
+
+
+The necessary operations are appending an element to a list, removing
+an element from a list, and having access to the first and last elements
+in a list. To maximize speed, use a doubly-lin'ked list with pointers
+to the first and last nodes, but not header or trailer nodes.
+Possible Modifications
+The Strand sort threshold can certainly be adjusted for a particular
+programming language, implementation, and platform. Likewise, the n/8
+pick in the Shuffle sort may be faster with n/16 or n/4. You could
+even have n/k where k is not a power of two. but that will make K
+unbalanced, and therefore inefficient. Of course, the time may be
+more then made up for, so it's worth a try.
+
+I've already tried some variants to increase speed, but the given
+algorithm is the fastest. I've tried sweeping both forward and
+backward on the Strand sort, and also checking if an element is
+either greater then the last or smaller then the first element of
+the sub-list for appending or prepending.
+
+Current Usage
+
+Although many have read the page, only a handful have responded.
+Some have claimed that it is mathematically impossible that this
+sort betters the quick sort. but they did not actually try to
+implement the sort to make the comparison themselves. Others have
+claimed that the J Sort is 30 times as fast as the quick sort. Still
+others have used it in studies and seminars of sorting on parallel
+processing computers. It is the sorting algorithm in Prometheus.
+
+7. Conclusion
+
+The J Sort has a wide variety of applications since elements are
+often in a linked-list, and there are no restrictions on the data
+type or key type. With this environment it consistently beats all other
+typical sorts. Additionally, it is quite suited for parallel processing.
+However it does have some restrictions. Please contact me if you have
+any questions, comments, or suggestions. Also, if you find the J Sort
+useful, please let me k-now about it. Thanks.
+     */
+    //class LibSort
+    //{
+    //    void librarySort(int length, float factor, int[] elements)
+    //    {
+    //        int i, j;
+    //        int expandedLen = (int)((1 + factor) * length);
+    //        int orderedElem = (int*)malloc(expandedLen * sizeof(int));
+
+    //        int flag = 1 << 31;
+    //        for (i = 0; i < expandedLen; i++)
+    //        {
+    //            orderedElem[i] = flag;
+    //        }
+
+    //        int index = 1;
+    //        int numOfIntercalatedElem = 1;
+    //        orderedElem[0] = elements[0];
+
+    //        while (length > numOfIntercalatedElem)
+    //        {
+    //            for (j = 0; j < numOfIntercalatedElem; j++)
+    //            {
+    //                int mid;
+    //                int low = 0;
+    //                int high = 2 * numOfIntercalatedElem - 1;
+    //                while (low <= high)
+    //                {
+    //                    mid = (low + high) / 2;
+
+    //                    int savedMid = mid;
+    //                    while (orderedElem[mid] == flag)
+    //                    {
+    //                        if (mid == high)
+    //                        {
+    //                            mid = savedMid - 1;
+    //                            while (orderedElem[mid] == flag)
+    //                            {
+    //                                mid--;
+    //                            }
+    //                            break;
+    //                        }
+    //                        mid++;
+    //                    }
+
+    //                    if (elements[index] > orderedElem[mid])
+    //                    {
+    //                        low = mid + 1;
+    //                        while (orderedElem[low] == flag)
+    //                        {
+    //                            low = low + 1;
+    //                        }
+    //                    }
+    //                    else
+    //                    {
+    //                        high = mid - 1;
+    //                    }
+    //                }
+
+    //                if (orderedElem[high + 1] == flag)
+    //                {
+    //                    orderedElem[high + 1] = elements[index];
+    //                }
+    //                else
+    //                {
+    //                    int temp = high + 1;
+    //                    while (orderedElem[temp] != flag)
+    //                    {
+    //                        temp--;
+    //                        if (temp < 0)
+    //                        {
+    //                            temp = high + 1;
+    //                            break;
+    //                        }
+    //                    }
+
+    //                    while (orderedElem[temp] != flag)
+    //                    {
+    //                        temp++;
+    //                    }
+
+    //                    while (temp < high)
+    //                    {
+    //                        orderedElem[temp] = orderedElem[temp + 1];
+    //                        temp++;
+    //                    }
+
+    //                    while (temp > high + 1)
+    //                    {
+    //                        orderedElem[temp] = orderedElem[temp - 1];
+    //                        temp--;
+    //                    }
+
+    //                    orderedElem[temp] = elements[index];
+    //                }
+    //                index++;
+    //                if (index == length)
+    //                {
+    //                    break;
+    //                }
+    //            }
+
+    //            numOfIntercalatedElem *= 2;
+    //            int generatedIndex;
+    //            for (j = numOfIntercalatedElem; j > 0; j--)
+    //            {
+    //                if (orderedElem[j] == flag)
+    //                {
+    //                    continue;
+    //                }
+    //                generatedIndex = j * 2;
+    //                if (generatedIndex >= expandedLen)
+    //                {
+    //                    generatedIndex = expandedLen - 1;
+    //                    if (orderedElem[generatedIndex] != flag)
+    //                    {
+    //                        break;
+    //                    }
+    //                }
+    //                orderedElem[generatedIndex] = orderedElem[j];
+    //                orderedElem[j] = flag;
+    //            }
+    //        }
+    //        for (i = 0; i < expandedLen; i++)
+    //        {
+    //            printf("%d\n", orderedElem[i]);
+    //        }
+
+    //
+    //  }
+    //}
+    /*    class BingoSort
+    {
+        bingo(array A)
+
+        {
+            This procedure sorts in ascending order by
+            repeatedly moving maximal items to the end. }
+        begin
+            last := length(A) - 1;
+
+    The first iteration is written to look very similar to the subsequent ones,
+      but without swaps.
+    nextMax := A[last];
+    for i := last - 1 downto 0 do
+        if A[i] > nextMax then
+            nextMax := A[i];
+    while (last > 0) and(A[last] = nextMax) do
+        last := last - 1;
+
+    while last > 0 do begin
+        prevMax := nextMax;
+        nextMax := A[last];
+        for i := last - 1 downto 0 do
+             if A[i] > nextMax then
+                 if A[i] <> prevMax then
+                     nextMax := A[i];
+                 else begin
+                     swap(A[i], A[last]);
+        last := last - 1;
+                 end
+        while (last > 0) and(A[last] = nextMax) do
+            last := last - 1;
+    end;
+end;
+}
+*/    
+
+
+
+
     public static class ArrayTools
     {
         public static bool IsSortedAscending<TSource>(this IList<TSource> dataSource) where TSource : IComparable
@@ -2231,35 +2774,50 @@ namespace SortLibrary
 
     public static class Bantchmark
     {
+        struct info
+        {
+            internal double milsec;
+            internal string name;
+        }
         public static void Test(int[] testarray, params Action<int[]>[] actions)
         {
-            List<double> milsec = new List<double>();
-            List<string> lst = new List<string>();
-            var myStopwatch = new System.Diagnostics.Stopwatch();
+            List<info> lst = new List<info>();
             for (int i = 0; i < actions.Length; i++)
             {
+                var myStopwatch = new System.Diagnostics.Stopwatch();
+                int[] artes = new int[testarray.Length];
+                testarray.CopyTo(artes, 0);
                 try
                 {
-                    myStopwatch.Start();
-                    actions[i].Invoke(testarray);
+                    myStopwatch.Restart();
+                    actions[i].Invoke(artes);
                     myStopwatch.Stop();
-                    if(!testarray.IsSortedAscending())
+                    if(!artes.IsSortedAscending())
                     {
                         throw new Exception("NoSortedExeption");
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Метод {actions[i].ToString()} не работает по причине {e.Message}");
+                    Console.WriteLine($"Метод {actions[i].Method.Name} не работает по причине {e.Message}");
                 }
-                milsec.Add(myStopwatch.Elapsed.TotalMilliseconds);
-                lst.Add(actions[i].ToString() + " " + myStopwatch.Elapsed.TotalMilliseconds.ToString());
-                myStopwatch.Reset();
+                lst.Add(new info { milsec = myStopwatch.Elapsed.TotalMilliseconds, name = actions[i].Method.Name});    
             }
             foreach (var item in lst)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(item.name + " - " + item.milsec);
             }
+            double min = lst[0].milsec;
+            string name = String.Empty;
+            for (int i = 0; i < lst.Count; i++)
+            {
+                if (min > lst[i].milsec)
+                {
+                    min = lst[i].milsec;
+                    name = lst[i].name;
+                }
+            }
+            Console.WriteLine(name);
         }
     }
 }
